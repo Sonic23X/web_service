@@ -2,7 +2,7 @@
 
   require_once dirname( __DIR__ ) . "/bdd/Conection.php";
 
-  class Products
+  class Staff
   {
 
     function Select()
@@ -11,7 +11,7 @@
       $pdo = new Conection();
       if(count($parametros) == 0)
       {
-        $select = $pdo->prepare("SELECT * FROM productos");
+        $select = $pdo->prepare("SELECT * FROM empleados");
         if($select->execute())
         {
           $res = $select->fetchAll(PDO::FETCH_ASSOC);
@@ -26,7 +26,7 @@
       elseif (count($parametros) == 1) {
         if(is_numeric($parametros[0]))
         {
-          $select = $pdo->prepare("SELECT * FROM productos WHERE codigo_barras = ?");
+          $select = $pdo->prepare("SELECT * FROM empleados WHERE id_empleados = ?");
           $select->bindparam(1, $parametros[0]);
           if($select->execute())
           {
@@ -58,17 +58,13 @@
       {
         $pdo = new Conection();
 
-        $insert = $pdo->prepare("INSERT INTO productos VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $insert->bindparam(1, $datos["codigo_barras"]);
-        $insert->bindparam(2, $datos["producto"]);
-        $insert->bindparam(3, $datos["marca"]);
-        $insert->bindparam(4, $datos["stock"]);
-        $insert->bindparam(5, $datos["stock_control"]);
-        $insert->bindparam(6, $datos["_id_medida"]);
-        $insert->bindparam(7, $datos["_id_departamento"]);
-        $insert->bindparam(8, $datos["costo_compra"]);
-        $insert->bindparam(9, $datos["costo_venta"]);
-        $insert->bindparam(10, $datos["status"]);
+        $insert = $pdo->prepare("INSERT INTO empleados VALUES (?, ?, ?, ?, ?, ?)");
+        $insert->bindparam(1, $datos["id_empleados"]);
+        $insert->bindparam(2, $datos["nombre"]);
+        $insert->bindparam(3, $datos["apellidos"]);
+        $insert->bindparam(4, $datos["direccion"]);
+        $insert->bindparam(5, $datos["telefono"]);
+        $insert->bindparam(6, $datos["status"]);
 
         if($insert->execute())
         {
@@ -89,19 +85,14 @@
       {
         $pdo = new Conection();
 
-        $update = $pdo->prepare("UPDATE productos SET producto=?, marca=?, stock=?, stock_control=?, ".
-                  "_id_medida=?, _id_departamento=?, costo_compra=?, costo_venta=?, status=? ".
-                  "WHERE codigo_barras=?");
-        $update->bindparam(1, $datos["producto"]);
-        $update->bindparam(2, $datos["marca"]);
-        $update->bindparam(3, $datos["stock"]);
-        $update->bindparam(4, $datos["stock_control"]);
-        $update->bindparam(5, $datos["_id_medida"]);
-        $update->bindparam(6, $datos["_id_departamento"]);
-        $update->bindparam(7, $datos["costo_compra"]);
-        $update->bindparam(8, $datos["costo_venta"]);
-        $update->bindparam(9, $datos["status"]);
-        $update->bindparam(10, $datos["codigo_barras"]);
+        $update = $pdo->prepare("UPDATE empleados SET nombre=?, apellidos=?, direccion=?, telefono=?, ".
+                  "status=? WHERE id_empleados=?");
+        $update->bindparam(1, $datos["nombre"]);
+        $update->bindparam(2, $datos["apellidos"]);
+        $update->bindparam(3, $datos["direccion"]);
+        $update->bindparam(4, $datos["telefono"]);
+        $update->bindparam(5, $datos["status"]);
+        $update->bindparam(6, $datos["id_empleados"]);
 
         if($update->execute())
         {
@@ -110,7 +101,7 @@
         }
         else
         {
-          $error = array('error' => 'No se pudo actualizar el registro');
+          $error = array('Error' => 'No se pudo actualizar el registro');
           return json_encode($error);
         }
       }
@@ -122,7 +113,7 @@
       {
         $pdo = new Conection();
 
-        $select = $pdo->prepare("UPDATE productos SET status=0 WHERE codigo_barras = ?");
+        $select = $pdo->prepare("UPDATE empleados SET status=0 WHERE id_empleados = ?");
         $select->bindparam(1, $id);
         if($select->execute())
         {
@@ -131,7 +122,7 @@
         }
         else
         {
-          $error = array('Error' => 'No se pudo deshabilitar el registro');
+          $error = array('Error' => 'No se pudo deshabilitar el empleado');
           return json_encode($error);
         }
       }

@@ -1,6 +1,10 @@
 <?php
 
+  //clases de las tablas
   require_once "CRUDS/Products.php";
+  require_once "CRUDS/Staff.php";
+  require_once "CRUDS/Department.php";
+  require_once "CRUDS/Tax.php";
 
   class Manager
   {
@@ -14,13 +18,9 @@
         {
           case 'GET':
             if (isset($_GET['value']))
-            {
               echo $products->Select($_GET['value']);
-            }
             else
-            {
               echo $products->Select();
-            }
             break;
           case 'POST':
             $json = json_decode(file_get_contents('php://input')); //obtener json por post
@@ -60,7 +60,7 @@
               echo $products->Update($array);
             else
             {
-              $error = array('Error' => 'Error, no se recibio informacion ah agregar');
+              $error = array('Error' => 'Error, no se recibio informacion ah actualizar');
               echo json_encode($error);
             }
             break;
@@ -84,64 +84,61 @@
     {
       header('Content-Type: application/JSON');
       $method = $_SERVER['REQUEST_METHOD'];
-      $pdo = new Conection();
+      $staff = new Staff();
 
       switch ($method)
       {
         case 'GET':
           if (isset($_GET['value']))
-          {
-            $select = $pdo->prepare("SELECT * FROM empleados WHERE id_empleados = ?");
-            $select->bindparam(1, $_GET['value']);
-            if($select->execute())
-            {
-              $res = $select->fetchAll(PDO::FETCH_ASSOC);
-              $json = json_encode($res);
-              echo $json;
-            }
-            else
-            {
-              $erroy = array('error' => 'No se puede acceder a la base de datos');
-              echo json_encode($erroy);
-            }
-          }
+            echo $staff->Select($_GET['value']);
           else
-          {
-            $select = $pdo->prepare("SELECT * FROM empleados");
-            $select->setFetchMode(PDO::FETCH_ASSOC);
-            if($select->execute())
-            {
-              $json = $select->fetchAll(PDO::FETCH_ASSOC);
-              echo json_encode($json);
-            }
-            else
-            {
-              $erroy = array('error' => 'No se puede acceder a la base de datos');
-              echo json_encode($erroy);
-            }
-          }
+            echo $staff->Select();
           break;
         case 'POST':
-
+          $json = json_decode(file_get_contents('php://input')); //obtener json por post
+          $array = (array)$json;
+          if(empty($array))
+          {
+            $error = array('Error' => 'Error, no se recibio informacion ah agregar');
+            echo json_encode($error);
+          }
+          elseif(
+            isset($json->id_empleados) and isset($json->nombre) and isset($json->apellidos) and
+            isset($json->direccion) and isset($json->telefono) and isset($json->status)
+            )
+            echo $staff->Insert($array);
+          else
+          {
+            $error = array('Error' => 'Error, no se recibio informacion a insertar');
+            echo json_encode($error);
+          }
           break;
         case 'PUT':
-
-            break;
+          $json = json_decode(file_get_contents('php://input')); //obtener json por post
+          $array = (array)$json;
+          if(empty($array))
+          {
+            $error = array('Error' => 'Error, no se recibio informacion ah agregar');
+            echo json_encode($error);
+          }
+          elseif(
+            isset($json->id_empleados) and isset($json->nombre) and isset($json->apellidos) and
+            isset($json->direccion) and isset($json->telefono) and isset($json->status)
+            )
+            echo $staff->Update($array);
+          else
+          {
+            $error = array('Error' => 'Error, no se recibio informacion ah actualizar');
+            echo json_encode($error);
+          }
+          break;
         case 'DELETE':
           if (isset($_GET['value']))
+            echo $staff->Delete($_GET['value']);
+          else
           {
-            $select = $pdo->prepare("UPDATE empleados SET status=0 WHERE id_empleados = ?");
-            $select->bindparam(1, $_GET['value']);
-            if($select->execute())
-            {
-              $status = array('Message' => 'Operacion exitosa');
-            }
-            else
-            {
-              $error = array('error' => 'No se pudo deshabilitar el registro');
-              $error_json = json_encode($error);
-              echo $error_json;
-            }
+            $error = array('error' => 'Error, verifique parametros de entrada');
+            echo json_encode($error);
           }
           break;
         default:
@@ -156,64 +153,55 @@
     {
       header('Content-Type: application/JSON');
       $method = $_SERVER['REQUEST_METHOD'];
-      $pdo = new Conection();
+      $department = new Department();
 
       switch ($method)
       {
         case 'GET':
           if (isset($_GET['value']))
-          {
-            $select = $pdo->prepare("SELECT * FROM departamento WHERE id_departamento = ?");
-            $select->bindparam(1, $_GET['value']);
-            if($select->execute())
-            {
-              $res = $select->fetchAll(PDO::FETCH_ASSOC);
-              $json = json_encode($res);
-              echo $json;
-            }
-            else
-            {
-              $erroy = array('error' => 'No se puede acceder a la base de datos');
-              echo json_encode($erroy);
-            }
-          }
+            echo $department->Select($_GET['value']);
           else
-          {
-            $select = $pdo->prepare("SELECT * FROM departamento");
-            $select->setFetchMode(PDO::FETCH_ASSOC);
-            if($select->execute())
-            {
-              $json = $select->fetchAll(PDO::FETCH_ASSOC);
-              echo json_encode($json);
-            }
-            else
-            {
-              $erroy = array('error' => 'No se puede acceder a la base de datos');
-              echo json_encode($erroy);
-            }
-          }
+            echo $department->Select();
           break;
         case 'POST':
-
+          $json = json_decode(file_get_contents('php://input')); //obtener json por post
+          $array = (array)$json;
+          if(empty($array))
+          {
+            $error = array('Error' => 'Error, no se recibio informacion ah agregar');
+            echo json_encode($error);
+          }
+          elseif(isset($json->id_departamento) and isset($json->departamento) and isset($json->status))
+            echo $department->Insert($array);
+          else
+          {
+            $error = array('Error' => 'Error, no se recibio informacion a insertar');
+            echo json_encode($error);
+          }
           break;
         case 'PUT':
-
-            break;
+          $json = json_decode(file_get_contents('php://input')); //obtener json por post
+          $array = (array)$json;
+          if(empty($array))
+          {
+            $error = array('Error' => 'Error, no se recibio informacion ah agregar');
+            echo json_encode($error);
+          }
+          elseif(isset($json->id_departamento) and isset($json->departamento) and isset($json->status))
+            echo $department->Update($array);
+          else
+          {
+            $error = array('Error' => 'Error, no se recibio informacion ah actualizar');
+            echo json_encode($error);
+          }
+          break;
         case 'DELETE':
           if (isset($_GET['value']))
+            echo $department->Delete($_GET['value']);
+          else
           {
-            $select = $pdo->prepare("UPDATE departamento SET status=0 WHERE id_departamento = ?");
-            $select->bindparam(1, $_GET['value']);
-            if($select->execute())
-            {
-              $status = array('Message' => 'Operacion exitosa');
-            }
-            else
-            {
-              $error = array('error' => 'No se pudo deshabilitar el registro');
-              $error_json = json_encode($error);
-              echo $error_json;
-            }
+            $error = array('error' => 'Error, verifique parametros de entrada');
+            echo json_encode($error);
           }
           break;
         default:
@@ -226,12 +214,61 @@
 
     public function impuestos()
     {
-      // code...
+      header('Content-Type: application/JSON');
+      $method = $_SERVER['REQUEST_METHOD'];
+      $tax = new Tax();
+
+      switch ($method)
+      {
+        case 'GET':
+          if (isset($_GET['value']))
+            echo $tax->Select($_GET['value']);
+          else
+            echo $tax->Select();
+          break;
+        case 'POST':
+          $json = json_decode(file_get_contents('php://input')); //obtener json por post
+          $array = (array)$json;
+          if(empty($array))
+          {
+            $error = array('Error' => 'Error, no se recibio informacion ah agregar');
+            echo json_encode($error);
+          }
+          elseif(isset($json->id_impuestos) and isset($json->impuesto))
+            echo $tax->Insert($array);
+          else
+          {
+            $error = array('Error' => 'Error, no se recibio informacion a insertar');
+            echo json_encode($error);
+          }
+          break;
+        case 'PUT':
+          $json = json_decode(file_get_contents('php://input')); //obtener json por post
+          $array = (array)$json;
+          if(empty($array))
+          {
+            $error = array('Error' => 'Error, no se recibio informacion ah agregar');
+            echo json_encode($error);
+          }
+          elseif(isset($json->id_impuestos) and isset($json->impuesto))
+            echo $tax->Update($array);
+          else
+          {
+            $error = array('Error' => 'Error, no se recibio informacion ah actualizar');
+            echo json_encode($error);
+          }
+          break;
+        default:
+          $error = array('error' => 'La operacion que usted quiere realizar no existe');
+          $error_json = json_encode($error);
+          echo $error_json;
+          break;
+      }
     }
 
     public function privilegios()
     {
-      // code...
+      
     }
 
     public function medida()
